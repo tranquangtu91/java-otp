@@ -11,7 +11,6 @@ public class GoogleAuthConfig {
 
     public GoogleAuthConfig() {
         this.gAuth = new GoogleAuthenticator();
-        System.out.println("GoogleAuthenticator initialized.");
     }
     /**
      * Tạo một secret key mới cho user

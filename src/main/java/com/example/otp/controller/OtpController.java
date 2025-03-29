@@ -1,5 +1,6 @@
 package com.example.otp.controller;
 import com.example.otp.dto.OtpRequestDto;
+import com.example.otp.dto.OtpResponseDto;
 import com.example.otp.service.OtpService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,29 +15,39 @@ public class OtpController {
     public OtpController(OtpService otpService) {
         this.otpService = otpService;
     }
-    // API để đăng ký user và lấy QR Code
+    // API để đăng ký user và lấy QR Cod
+//    @PostMapping("/register")
+//    public ResponseEntity<String> registerUser(@RequestBody OtpRequestDto request) {
+//        try {
+//            String base64Image = otpService.registerUser(request.getUserName());
+//            return ResponseEntity.ok("data:image/png;base64," + base64Image);
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error generating QR Code");
+//        }
+//    }
+    // API để đăng ký user và lấy QR code + secretKey
     @PostMapping("/register")
-    public ResponseEntity<String> registerUser(@RequestBody OtpRequestDto request) {
+    public ResponseEntity<OtpResponseDto> registerUser(@RequestBody OtpRequestDto request) {
         try {
-            String base64Image = otpService.registerUser(request.getUserName());
-            return ResponseEntity.ok("data:image/png;base64," + base64Image);
+            OtpResponseDto otpResponseDto  = otpService.registerUser(request.getUserName());
+            return ResponseEntity.ok(otpResponseDto);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error generating QR Code");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new OtpResponseDto());
         }
     }
-    @GetMapping("/qrcode/{userName}")
-    public ResponseEntity<String> getQRCode(@PathVariable String userName) {
+    @GetMapping("/register/{userName}")
+    public ResponseEntity<OtpResponseDto> getQRCode(@PathVariable String userName) {
         try {
-            String base64Image = otpService.registerUser(userName);
-            return ResponseEntity.ok("data:image/png;base64," + base64Image);
+            OtpResponseDto otpResponseDto  = otpService.registerUser(userName);
+            return ResponseEntity.ok(otpResponseDto);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error generating QR Code");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new OtpResponseDto());
         }
     }
     // API để xác thực OTP
     @PostMapping("/verify")
     public ResponseEntity<Boolean> verifyOtp(@RequestBody OtpRequestDto request) {
-        boolean isValid = otpService.verifyOtp(request.getUserName(), request.getOtp());
+        boolean isValid = otpService.verifyOtp(request.getSecretKey(), request.getOtp());
         return ResponseEntity.ok(isValid);
     }
 }
