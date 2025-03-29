@@ -38,7 +38,7 @@ public class OtpController {
     @GetMapping("/register/{userName}")
     public ResponseEntity<OtpResponseDto> getQRCode(@PathVariable String userName) {
         try {
-            OtpResponseDto otpResponseDto  = otpService.registry(userName);
+            OtpResponseDto otpResponseDto  = otpService.registerUser(userName);
             return ResponseEntity.ok(otpResponseDto);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new OtpResponseDto());

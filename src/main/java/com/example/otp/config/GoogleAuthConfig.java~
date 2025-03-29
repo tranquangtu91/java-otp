@@ -1,6 +1,7 @@
 package com.example.otp.config;
 
 import com.warrenstrange.googleauth.GoogleAuthenticator;
+import com.warrenstrange.googleauth.GoogleAuthenticatorConfig;
 import com.warrenstrange.googleauth.GoogleAuthenticatorKey;
 import com.warrenstrange.googleauth.GoogleAuthenticatorQRGenerator;
 import org.springframework.stereotype.Component;
@@ -10,8 +11,11 @@ public class GoogleAuthConfig {
     private final GoogleAuthenticator gAuth;
 
     public GoogleAuthConfig() {
-        this.gAuth = new GoogleAuthenticator();
-        System.out.println("GoogleAuthenticator initialized.");
+        GoogleAuthenticatorConfig config = new GoogleAuthenticatorConfig.GoogleAuthenticatorConfigBuilder()
+                .setTimeStepSizeInMillis(30000) // Mỗi OTP có hiệu lực trong 30 giây
+                .setWindowSize(1) // Chỉ chấp nhận OTP của thời điểm hiện tại
+                .build();
+        this.gAuth = new GoogleAuthenticator(config);
     }
     /**
      * Tạo một secret key mới cho user

@@ -2,8 +2,6 @@ package com.example.otp.service.impl;
 
 import com.example.otp.config.GoogleAuthConfig;
 import com.example.otp.dto.OtpResponseDto;
-import com.example.otp.entity.OtpRequest;
-import com.example.otp.repository.OtpRepository;
 import com.example.otp.service.OtpService;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
@@ -17,18 +15,12 @@ import org.springframework.stereotype.Service;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Base64;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class OtpServiceImpl implements OtpService {
     private final GoogleAuthConfig googleAuthConfig;
-    private final OtpRepository otpRepository;
-//  test nhanh k can DB
-    private final Map<String, String> fakeDb = new HashMap<>();
 
     private String generateQRCodeBase64(String otpAuthUrl) throws WriterException, IOException {
         QRCodeWriter qrCodeWriter = new QRCodeWriter();
@@ -38,48 +30,17 @@ public class OtpServiceImpl implements OtpService {
         MatrixToImageWriter.writeToStream(bitMatrix, "PNG", outputStream);
         return Base64.getEncoder().encodeToString(outputStream.toByteArray());
     }
-//lưu userName và secretKey vào DB otp
-//    @Override
-//    public String registerUser(String userName) throws IOException, WriterException {
-////        Optional<OtpRequest> existingUser = otpRepository.findByUsername(userName);
-////        if (existingUser.isPresent()) {
-////            return googleAuthConfig.generateQRCode(userName, existingUser.get().getSecretKey());
-////        }
-////        // Nếu không có, tạo secret key
-//          String secretKey = googleAuthConfig.generateSecretKey();
-//          if (secretKey == null) {
-//            throw new IllegalStateException("Secret Key is null.");
-//          }
-////        OtpRequest user = new OtpRequest();
-////        user.setUsername(userName);
-////        user.setSecretKey(secretKey);
-////        userRepository.save(user);
-////
-////        // Trả về QR Code URL
-////        return googleAuthConfig.generateQRCode(userName, secretKey);
-//        fakeDb.putIfAbsent(userName, secretKey);
-//        String qrCodeUrl = googleAuthConfig.generateQRCode(userName, fakeDb.get(userName));
-//        return generateQRCodeBase64(qrCodeUrl);
-//    }
 
     @Override
-    public OtpResponseDto registerUser(String userName) throws IOException, WriterException {
+    public OtpResponseDto registry(String issuer) throws IOException, WriterException {
         String secretKey = googleAuthConfig.generateSecretKey();
-        String qrCodeUrl = googleAuthConfig.generateQRCode(userName, secretKey);
-        log.info("Generated OTP for user: {}", userName);
-        return new OtpResponseDto(userName, secretKey, "data:image/png;base64," + generateQRCodeBase64(qrCodeUrl));
+        String qrCodeUrl = googleAuthConfig.generateQRCode(issuer, secretKey);
+        log.info("Generated OTP for user: {}", issuer);
+        return new OtpResponseDto(issuer, secretKey, "data:image/png;base64," + generateQRCodeBase64(qrCodeUrl));
     }
 
     @Override
     public boolean verifyOtp(String secretKey , int otp) {
-//        // Lấy secretKey từ database
-//        Optional<OtpRequest> user = otpRepository.findByUsername(userName);
-//        if (user.isEmpty()) return false;
-//
-//        // Kiểm tra mã OTP
-//        return googleAuthConfig.verifyOTP(user.get().getSecretKey(), otp);
-//        fakeDb
-//        return googleAuthConfig.verifyOTP(fakeDb.get(userName), otp);
         return googleAuthConfig.verifyOTP(secretKey, otp);
     }
 

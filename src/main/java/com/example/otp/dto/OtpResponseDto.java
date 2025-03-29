@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class OtpResponseDto {
-    private String userName;
+    private String issuer;
     private String secretKey;
     private String qrCodeUrl;
 }
